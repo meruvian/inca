@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<bean name="inca" type="com.opensymphony.xwork2.UnknownHandler" class="org.meruvian.inca.struts2.rest.RestUnknownHandler" />
+	<bean name="inca" type="com.opensymphony.xwork2.ActionProxyFactory" class="org.meruvian.inca.struts2.rest.RestActionProxyFactory" />
+	<bean name="inca" type="org.meruvian.inca.struts2.rest.discoverer.ActionFinder" class="org.meruvian.inca.struts2.rest.discoverer.DefaultActionFinder" />
+	<bean name="inca" type="com.opensymphony.xwork2.util.finder.Test" class="org.meruvian.inca.struts2.rest.discoverer.AnnotationClasspathFilter" />
+	<bean name="inca" type="org.meruvian.inca.struts2.rest.TransformManager" class="org.meruvian.inca.struts2.rest.DefaultTransformManager" />
+	<bean name="json" type="org.meruvian.inca.struts2.rest.transform.ResourceTransformer" class="org.meruvian.inca.struts2.rest.transform.JsonTransformer" />
+	<bean name="xml" type="org.meruvian.inca.struts2.rest.transform.ResourceTransformer" class="org.meruvian.inca.struts2.rest.transform.XmlTransformer" />
+	
+	<constant name="struts.action.extension" value=",action,xhtml,xml,json"/>
+	<constant name="struts.patternMatcher" value="regex" />
+	<constant name="struts.actionProxyFactory" value="inca" />
+	<constant name="struts.mapper.alwaysSelectFullNamespace" value="true" />
+	<constant name="struts.inca.rest.transformManager" value="inca" />
+	<constant name="struts.inca.actionFinder" value="inca" />
+	<constant name="struts.inca.action.filter" value="inca" />
+	<constant name="struts.inca.default.parent.package" value="struts-default" />
+	<constant name="struts.inca.handleRequestByHeader" value="false" />
+	<constant name="struts.inca.package.locators" value="actions, action, controller, controllers, struts, struts2" />
+	<constant name="struts.inca.exclude.packages.prefix" value="org.apache.struts, org.apache.struts2, org.springframework, org.hibernate" />
+</struts>
