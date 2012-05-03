@@ -11,6 +11,12 @@
 	<artifactId>inca-s2rest-plugin</artifactId>
 	<name>Inca S2Rest Plugin</name>
 	<description>Includes http method handling with annotation support.</description>
+	
+	<scm>
+		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-plugin</connection>
+		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-plugin</developerConnection>
+		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show</url>
+	</scm>
 
 	<dependencies>
 		<dependency>
@@ -24,10 +30,4 @@
 			<version>1.4.2</version>
 		</dependency>
 	</dependencies>
-	
-	<scm>
-		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-plugin</connection>
-		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-plugin</developerConnection>
-		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show</url>
-	</scm>
 </project>

@@ -10,9 +10,12 @@
 	<artifactId>inca-s2rest-showcase</artifactId>
 	<packaging>war</packaging>
 	<name>Inca S2Rest Showcase</name>
-
-	<properties>
-	</properties>
+	
+	<scm>
+		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-showcase</connection>
+		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-showcase</developerConnection>
+		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show</url>
+	</scm>
 
 	<build>
 		<plugins>
@@ -94,10 +97,4 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
-	
-	<scm>
-		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-showcase</connection>
-		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-showcase</developerConnection>
-		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show</url>
-	</scm>
 </project>
