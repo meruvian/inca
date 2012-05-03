@@ -5,40 +5,13 @@
 	<parent>
 		<artifactId>inca-s2rest-plugins</artifactId>
 		<groupId>org.meruvian.inca.s2restplugins</groupId>
-		<version>0.1-SNAPSHOT</version>
+		<version>1.0-SNAPSHOT</version>
 	</parent>
 
-	<groupId>org.meruvian.inca</groupId>
+	<groupId>org.meruvian.inca.s2restplugins</groupId>
 	<artifactId>inca-s2rest-plugin</artifactId>
-	<name>Inca Struts2 Plugin</name>
+	<name>Inca S2Rest Plugin</name>
 	<description>Includes http method handling with annotation support.</description>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.reflections</groupId>
-				<artifactId>reflections-maven</artifactId>
-				<version>0.9.6</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>reflections</goal>
-						</goals>
-						<phase>process-classes</phase>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<target>1.6</target>
-					<source>1.6</source>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
 
 	<dependencies>
 		<dependency>
@@ -52,4 +25,10 @@
 			<version>1.4.2</version>
 		</dependency>
 	</dependencies>
+	
+	<scm>
+		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-plugin</connection>
+		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-plugin</developerConnection>
+		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show</url>
+	</scm>
 </project>

@@ -9,12 +9,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.meruvian.inca.s2restplugins</groupId>
 	<artifactId>inca-s2rest-plugins</artifactId>
-	<version>0.1-SNAPSHOT</version>
+	<version>1.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>Inca Struts2 Rest</name>
+	<name>Inca S2Rest Plugins Parent Artifact</name>
 
-	<description>The parent project of Inca Struts2 Rest</description>
+	<description>The parent project of Inca S2Rest</description>
 	<inceptionYear>2012</inceptionYear>
+
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -27,6 +28,19 @@
 		<name>Meruvian</name>
 		<url>http://www.meruvian.org</url>
 	</organization>
+
+	<developers>
+		<developer>
+			<id>fthamura</id>
+			<name>Frans Thamura</name>
+			<email>frans@meruvian.org</email>
+		</developer>
+		<developer>
+			<id>dianw</id>
+			<name>Dian Aditya</name>
+			<email>dian.aditya@meruvian.org</email>
+		</developer>
+	</developers>
 
 	<build>
 		<plugins>
@@ -104,7 +118,7 @@
 	<scm>
 		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk</connection>
 		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk</developerConnection>
-		<url>https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk</url>
+		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show</url>
 	</scm>
 
 	<distributionManagement>

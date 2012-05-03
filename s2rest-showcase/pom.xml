@@ -5,12 +5,12 @@
 	<parent>
 		<artifactId>inca-s2rest-plugins</artifactId>
 		<groupId>org.meruvian.inca.s2restplugins</groupId>
-		<version>0.1-SNAPSHOT</version>
+		<version>1.0-SNAPSHOT</version>
 	</parent>
-	<groupId>org.meruvian.inca</groupId>
+	<groupId>org.meruvian.inca.s2restplugins</groupId>
 	<artifactId>inca-s2rest-showcase</artifactId>
 	<packaging>war</packaging>
-	<name>Yama Struts2 Webapp</name>
+	<name>Inca S2Rest Showcase</name>
 
 	<properties>
 	</properties>
@@ -27,8 +27,8 @@
 			</plugin>
 		</plugins>
 	</build>
+	
 	<dependencies>
-
 		<dependency>
 			<groupId>org.apache.struts</groupId>
 			<artifactId>struts2-core</artifactId>
@@ -90,9 +90,15 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.meruvian.inca</groupId>
+			<groupId>org.meruvian.inca.s2restplugins</groupId>
 			<artifactId>inca-s2rest-plugin</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
+	
+	<scm>
+		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-showcase</connection>
+		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-showcase</developerConnection>
+		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show</url>
+	</scm>
 </project>
