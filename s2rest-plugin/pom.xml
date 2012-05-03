@@ -26,8 +26,8 @@
 	</dependencies>
 	
 	<scm>
-		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/tags/inca-s2rest-plugins-1.0/s2rest-plugin</connection>
-		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/tags/inca-s2rest-plugins-1.0/s2rest-plugin</developerConnection>
-		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show/tags/inca-s2rest-plugins-1.0/show</url>
+		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-plugin</connection>
+		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-plugin</developerConnection>
+		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show</url>
 	</scm>
 </project>

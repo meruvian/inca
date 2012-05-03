@@ -115,9 +115,9 @@
 	</modules>
 
 	<scm>
-		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/tags/inca-s2rest-plugins-1.0</connection>
-		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/tags/inca-s2rest-plugins-1.0</developerConnection>
-		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show/tags/inca-s2rest-plugins-1.0</url>
+		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk</connection>
+		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk</developerConnection>
+		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show</url>
 	</scm>
 
 	<distributionManagement>
