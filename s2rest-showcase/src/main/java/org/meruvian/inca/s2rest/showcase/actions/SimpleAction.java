@@ -13,41 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.meruvian.inca.s2rest.showcase;
+package org.meruvian.inca.s2rest.showcase.actions;
 
-import java.io.Serializable;
+import org.meruvian.inca.struts2.rest.ActionResult;
+import org.meruvian.inca.struts2.rest.annotation.Action;
+import org.meruvian.inca.struts2.rest.annotation.ActionParam;
 
 /**
  * @author Dian Aditya
  * 
  */
-public class Contact implements Serializable {
-	private String name;
-	private String phone;
-	private String address;
-
-	public String getName() {
-		return name;
+@Action(name = "/simple")
+public class SimpleAction {
+	
+	@ActionParam("url")
+	private String url = "/simple";
+	
+	public ActionResult execute() {
+		return new ActionResult("/WEB-INF/view/simple/simple-index.jsp");
 	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public String getPhone() {
-		return phone;
-	}
-
-	public void setPhone(String phone) {
-		this.phone = phone;
-	}
-
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
 }
