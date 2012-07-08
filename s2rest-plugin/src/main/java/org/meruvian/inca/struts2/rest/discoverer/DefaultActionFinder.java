@@ -15,6 +15,9 @@
  */
 package org.meruvian.inca.struts2.rest.discoverer;
 
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -36,6 +39,7 @@ import org.meruvian.inca.struts2.rest.annotation.Interceptors;
 import org.meruvian.inca.struts2.rest.annotation.Result;
 import org.meruvian.inca.struts2.rest.annotation.Results;
 import org.meruvian.inca.struts2.rest.commons.ActionUtils;
+import org.meruvian.inca.struts2.rest.commons.ClasspathUtil;
 import org.meruvian.inca.struts2.rest.commons.RestConstants;
 import org.meruvian.inca.struts2.rest.commons.StringUtils;
 
@@ -68,6 +72,10 @@ public class DefaultActionFinder implements ActionFinder {
 				container.getInstance(String.class,
 						StrutsConstants.STRUTS_PATTERNMATCHER));
 		this.pool = ClassPool.getDefault();
+		for (URL url : ClasspathUtil.getUrlSet().getUrls()) {
+			this.pool.appendClassPath(url.getPath());
+		}
+
 		this.discoverer = new StrutsAnnotationDiscoverer(filter);
 
 		actionForClassName = new HashMap<String, ActionDetails>();
@@ -85,16 +93,17 @@ public class DefaultActionFinder implements ActionFinder {
 				Action.class);
 
 		CtClass actionclass = pool.get(classname);
+
 		// Create proxyObject
 		actionclass.setName(classname + "$$$ActionProxy");
 		actionclass.setSuperclass(pool.get(classname));
 
 		buildClassProperty(classname, actionclass);
 
+		Class actionClass = actionclass.toClass();
+
 		for (String method : methods) {
-			CtMethod actionMethod = actionclass.getDeclaredMethod(method);
-			ActionDetails details = buildActionDetails(actionclass,
-					actionMethod);
+			ActionDetails details = buildActionDetails(actionClass, method);
 
 			// actionForRequest.put(details.getRequestUri(), details);
 			actionForRequest.put(details, details);
@@ -102,34 +111,42 @@ public class DefaultActionFinder implements ActionFinder {
 		}
 
 		{
-			ActionDetails details = buildActionDetails(actionclass, null);
+			ActionDetails details = buildActionDetails(actionClass, null);
 
 			actionForRequest.put(details, details);
 			actionForClassName.put(actionclass.getName(), details);
 		}
 	}
 
-	private ActionDetails buildActionDetails(CtClass actionClass,
-			CtMethod actionMethod) throws Exception {
+	private ActionDetails buildActionDetails(Class actionClass,
+			String actionMethod) throws Exception {
 
 		if (actionMethod == null) {
-			try {
-				actionMethod = actionClass.getDeclaredMethod("execute");
-			} catch (NotFoundException e) {
-			}
+			actionMethod = "execute";
 		}
 
-		Action classAnnotation = ActionUtils.findActionAnnotation(actionClass);
-		Action methodAnnotation = ActionUtils.findAnnotation(actionMethod,
-				Action.class);
-		Interceptors interceptors = ActionUtils.findAnnotation(actionMethod,
-				Interceptors.class);
-		ExceptionMappings exceptionMappings = ActionUtils.findAnnotation(
-				actionMethod, ExceptionMappings.class);
+		Class<?> cachedActionClass = actionClasses.get(actionClass.getName());
 
-		Results actionResults = ActionUtils.findAnnotation(actionClass,
+		if (cachedActionClass == null) {
+			cachedActionClass = actionClass;
+			actionClasses.put(cachedActionClass.getName(), cachedActionClass);
+		}
+
+		Method actionMethodClass = cachedActionClass
+				.getDeclaredMethod(actionMethod);
+
+		Action classAnnotation = ActionUtils.findAnnotation(cachedActionClass,
+				Action.class);
+		Action methodAnnotation = ActionUtils.findAnnotation(actionMethodClass,
+				Action.class);
+		Interceptors interceptors = ActionUtils.findAnnotation(
+				actionMethodClass, Interceptors.class);
+		ExceptionMappings exceptionMappings = ActionUtils.findAnnotation(
+				actionMethodClass, ExceptionMappings.class);
+
+		Results actionResults = ActionUtils.findAnnotation(cachedActionClass,
 				Results.class);
-		Results methodResults = ActionUtils.findAnnotation(actionMethod,
+		Results methodResults = ActionUtils.findAnnotation(actionMethodClass,
 				Results.class);
 
 		ActionDetails details = new ActionDetails();
@@ -138,19 +155,11 @@ public class DefaultActionFinder implements ActionFinder {
 			details.setActionMethod("execute");
 			details.setActionAnnotation(classAnnotation);
 		} else {
-			details.setActionMethod(actionMethod.getName());
+			details.setActionMethod(actionMethod);
 			details.setActionAnnotation(methodAnnotation);
 		}
 
-		Class<?> generatedActionclass = actionClasses
-				.get(actionClass.getName());
-
-		if (generatedActionclass == null) {
-			generatedActionclass = actionClass.toClass();
-			actionClasses.put(actionClass.getName(), generatedActionclass);
-		}
-
-		details.setActionClass(generatedActionclass);
+		details.setActionClass(cachedActionClass);
 		details.setNamespace(ActionUtils.getUriFromAnnotation(classAnnotation));
 		details.setAction(ActionUtils.getUriFromAnnotation(methodAnnotation));
 		details.setHttpMethod(details.getActionAnnotation().method());

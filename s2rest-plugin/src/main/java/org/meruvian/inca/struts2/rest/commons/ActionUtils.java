@@ -16,6 +16,7 @@
 package org.meruvian.inca.struts2.rest.commons;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 
 import javassist.CtClass;
 import javassist.CtMember;
@@ -40,24 +41,33 @@ public class ActionUtils {
 		return actionUri;
 	}
 
-	public static <T> T findAnnotation(CtMember ct,
-			Class<? extends Annotation> clazz) throws ClassNotFoundException {
+	@Deprecated
+	public static <T extends Annotation> T findAnnotation(CtMember ct,
+			Class<T> clazz) throws ClassNotFoundException {
 		if (ct == null || clazz == null)
 			return null;
 
 		return (T) ct.getAnnotation(clazz);
 	}
 
-	public static <T> T findAnnotation(CtClass ct,
-			Class<? extends Annotation> clazz) throws ClassNotFoundException {
+	@Deprecated
+	public static <T extends Annotation> T findAnnotation(CtClass ct,
+			Class<T> clazz) throws ClassNotFoundException {
 		if (ct == null || clazz == null)
 			return null;
 
 		return (T) ct.getAnnotation(clazz);
 	}
 
+	@Deprecated
 	public static Action findActionAnnotation(CtClass ct)
 			throws ClassNotFoundException {
 		return (Action) ct.getAnnotation(Action.class);
+	}
+
+	public static <T extends Annotation> T findAnnotation(
+			AnnotatedElement element, Class<T> annotationClass) {
+
+		return element.getAnnotation(annotationClass);
 	}
 }

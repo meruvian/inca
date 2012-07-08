@@ -19,7 +19,6 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -38,11 +37,8 @@ import javassist.bytecode.FieldInfo;
 import javassist.bytecode.MethodInfo;
 import javassist.bytecode.annotation.Annotation;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.meruvian.inca.struts2.rest.commons.ClasspathUtil;
 
-import com.opensymphony.xwork2.ActionContext;
-import com.opensymphony.xwork2.util.finder.ClassLoaderInterface;
-import com.opensymphony.xwork2.util.finder.ClassLoaderInterfaceDelegate;
 import com.opensymphony.xwork2.util.finder.Test;
 import com.opensymphony.xwork2.util.finder.UrlSet;
 
@@ -66,8 +62,7 @@ public class StrutsAnnotationDiscoverer implements AnnotationDiscoverer {
 			throws Exception {
 		List<String> annotatedClasses = new ArrayList<String>();
 
-		for (InputStream stream : getClassFiles(getClassLoaderInterface(),
-				filter)) {
+		for (InputStream stream : getClassFiles(filter)) {
 			ClassFile classFile = new ClassFile(new DataInputStream(stream));
 
 			Set<Annotation> annotations = new HashSet<Annotation>();
@@ -167,12 +162,11 @@ public class StrutsAnnotationDiscoverer implements AnnotationDiscoverer {
 		return annotatedFields;
 	}
 
-	protected List<InputStream> getClassFiles(
-			ClassLoaderInterface loaderInterface, final Test<String> test)
+	protected List<InputStream> getClassFiles(final Test<String> test)
 			throws Exception {
 		List<InputStream> classStream = new ArrayList<InputStream>();
 
-		UrlSet urlSet = getUrlSet(loaderInterface);
+		UrlSet urlSet = ClasspathUtil.getUrlSet();
 
 		for (URL url : urlSet.getUrls()) {
 			classPool.appendClassPath(url.getPath());
@@ -230,28 +224,28 @@ public class StrutsAnnotationDiscoverer implements AnnotationDiscoverer {
 		return files;
 	}
 
-	protected UrlSet getUrlSet(ClassLoaderInterface loaderInterface)
-			throws IOException {
-		UrlSet urlSet = new UrlSet(getClassLoaderInterface());
-		urlSet.excludeJavaEndorsedDirs();
-		urlSet.excludeJavaExtDirs();
-
-		return urlSet;
-	}
-
-	protected ClassLoaderInterface getClassLoaderInterface() {
-		ClassLoaderInterface classLoaderInterface = null;
-		ActionContext ctx = ActionContext.getContext();
-		if (ctx != null)
-			classLoaderInterface = (ClassLoaderInterface) ctx
-					.get(ClassLoaderInterface.CLASS_LOADER_INTERFACE);
-
-		return (ClassLoaderInterface) ObjectUtils.defaultIfNull(
-				classLoaderInterface, new ClassLoaderInterfaceDelegate(
-						getClassLoader()));
-	}
-
-	protected ClassLoader getClassLoader() {
-		return Thread.currentThread().getContextClassLoader();
-	}
+	// protected UrlSet getUrlSet(ClassLoaderInterface loaderInterface)
+	// throws IOException {
+	// UrlSet urlSet = new UrlSet(getClassLoaderInterface());
+	// urlSet.excludeJavaEndorsedDirs();
+	// urlSet.excludeJavaExtDirs();
+	//
+	// return urlSet;
+	// }
+	//
+	// protected ClassLoaderInterface getClassLoaderInterface() {
+	// ClassLoaderInterface classLoaderInterface = null;
+	// ActionContext ctx = ActionContext.getContext();
+	// if (ctx != null)
+	// classLoaderInterface = (ClassLoaderInterface) ctx
+	// .get(ClassLoaderInterface.CLASS_LOADER_INTERFACE);
+	//
+	// return (ClassLoaderInterface) ObjectUtils.defaultIfNull(
+	// classLoaderInterface, new ClassLoaderInterfaceDelegate(
+	// getClassLoader()));
+	// }
+	//
+	// protected ClassLoader getClassLoader() {
+	// return Thread.currentThread().getContextClassLoader();
+	// }
 }
