@@ -42,7 +42,7 @@ public class ArticleAction {
 </div>
 
 <div>
-	<form class="form-horizontal" action="<%= request.getAttribute("javax.servlet.forward.context_path") + "" + request.getAttribute("struts.request_uri") %>" method="post">
+	<s:form cssClass="form-horizontal" method="post">
 		<div class="control-group">
 			<label class="control-label" for="title">Title</label>
 			<div class="controls">
@@ -79,5 +79,5 @@ public class ArticleAction {
 			<input type="submit" value="Save" class="btn btn-primary" style="width: 100px;" />
 			<input type="reset" value="Reset" class="btn" style="width: 100px;" />
 		</div>
-	</form>
+	</s:form>
 </div>

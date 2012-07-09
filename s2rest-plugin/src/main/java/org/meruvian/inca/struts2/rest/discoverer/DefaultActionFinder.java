@@ -17,7 +17,6 @@ package org.meruvian.inca.struts2.rest.discoverer;
 
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,7 +27,6 @@ import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
-import javassist.NotFoundException;
 
 import org.apache.struts2.StrutsConstants;
 import org.meruvian.inca.struts2.rest.annotation.Action;
@@ -132,8 +130,12 @@ public class DefaultActionFinder implements ActionFinder {
 			actionClasses.put(cachedActionClass.getName(), cachedActionClass);
 		}
 
-		Method actionMethodClass = cachedActionClass
-				.getDeclaredMethod(actionMethod);
+		Method actionMethodClass = null;
+
+		try {
+			actionMethodClass = cachedActionClass.getMethod(actionMethod);
+		} catch (NoSuchMethodException e) {
+		}
 
 		Action classAnnotation = ActionUtils.findAnnotation(cachedActionClass,
 				Action.class);
@@ -262,28 +264,6 @@ public class DefaultActionFinder implements ActionFinder {
 
 			return null;
 		}
-
-		// @Override
-		// public ActionDetails get(Object key) {
-		// if (key == null)
-		// return null;
-		//
-		// for (String k : keySet()) {
-		// Object o = patternMatcher.compilePattern(k);
-		// Map<String, String> map = new HashMap<String, String>();
-		// if (patternMatcher.match(map, (String) key, o)) {
-		// ActionDetails details = super.get(k);
-		// details.setParameter(map);
-		// return details;
-		// }
-		// }
-		//
-		// ActionDetails action = super.get(key);
-		// if (action != null)
-		// return action;
-		//
-		// return null;
-		// }
 	}
 
 }

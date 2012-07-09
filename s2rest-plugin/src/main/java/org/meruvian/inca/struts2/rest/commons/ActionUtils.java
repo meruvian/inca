@@ -67,6 +67,8 @@ public class ActionUtils {
 
 	public static <T extends Annotation> T findAnnotation(
 			AnnotatedElement element, Class<T> annotationClass) {
+		if (element == null)
+			return null;
 
 		return element.getAnnotation(annotationClass);
 	}
