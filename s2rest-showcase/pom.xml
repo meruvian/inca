@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>inca-s2rest-plugins</artifactId>
 		<groupId>org.meruvian.inca.s2restplugins</groupId>
-		<version>1.0.1</version>
+		<version>1.0.2-SNAPSHOT</version>
 	</parent>
 	<groupId>org.meruvian.inca.s2restplugins</groupId>
 	<artifactId>inca-s2rest-showcase</artifactId>
@@ -12,9 +12,9 @@
 	<name>Inca S2Rest Showcase</name>
 
 	<scm>
-		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/tags/inca-s2rest-plugins-1.0.1/s2rest-showcase</connection>
-		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/tags/inca-s2rest-plugins-1.0.1/s2rest-showcase</developerConnection>
-		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show/tags/inca-s2rest-plugins-1.0.1/show</url>
+		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-showcase</connection>
+		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-showcase</developerConnection>
+		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show</url>
 	</scm>
 
 	<build>
