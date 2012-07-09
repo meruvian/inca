@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<artifactId>inca-s2rest-plugins</artifactId>
 		<groupId>org.meruvian.inca.s2restplugins</groupId>
-		<version>1.0.1-SNAPSHOT</version>
+		<version>1.0.1</version>
 	</parent>
 	<groupId>org.meruvian.inca.s2restplugins</groupId>
 	<artifactId>inca-s2rest-showcase</artifactId>
@@ -13,9 +12,9 @@
 	<name>Inca S2Rest Showcase</name>
 
 	<scm>
-		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-showcase</connection>
-		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-showcase</developerConnection>
-		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show</url>
+		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/tags/inca-s2rest-plugins-1.0.1/s2rest-showcase</connection>
+		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/tags/inca-s2rest-plugins-1.0.1/s2rest-showcase</developerConnection>
+		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show/tags/inca-s2rest-plugins-1.0.1/show</url>
 	</scm>
 
 	<build>
