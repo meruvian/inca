@@ -13,14 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.meruvian.inca.struts2.rest.discoverer;
+package org.meruvian.inca.struts2.test.action;
+
+import org.meruvian.inca.struts2.rest.annotation.Action;
+import org.meruvian.inca.struts2.rest.annotation.Action.HttpMethod;
 
 /**
  * @author Dian Aditya
  * 
  */
-public interface ActionFinder {
-	ActionDetails findAction(String namespace, String action, String httpMethod);
+@Action(name = "/default")
+public class ActionTestAction {
 
-	ActionDetails findActionClass(String className);
+	@Action(name = "/list")
+	public String list() {
+		return null;
+	}
+
+	@Action(method = HttpMethod.GET)
+	public String defaultActionMethod() {
+		return null;
+	}
+
+	@Action(name = "detail/{param1}")
+	public String detail() {
+		return null;
+	}
+
+	@Action(name = "detail/1")
+	public String detail1() {
+		return null;
+	}
 }

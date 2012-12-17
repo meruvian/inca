@@ -15,9 +15,9 @@
  */
 package org.meruvian.inca.struts2.rest.discoverer;
 
+import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
@@ -30,7 +30,6 @@ import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import javassist.ClassPool;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.FieldInfo;
@@ -49,57 +48,59 @@ import com.opensymphony.xwork2.util.finder.UrlSet;
 public class StrutsAnnotationDiscoverer implements AnnotationDiscoverer {
 
 	private Test<String> filter;
-	private ClassPool classPool;
 
 	public StrutsAnnotationDiscoverer(Test<String> filter) {
 		this.filter = filter;
-		classPool = ClassPool.getDefault();
 	}
 
-	@Override
-	public List<String> discoverClassesForAnnotation(
+	public List<ClassFile> discoverClassesForAnnotation(
 			Class<? extends java.lang.annotation.Annotation> annotation)
 			throws Exception {
-		List<String> annotatedClasses = new ArrayList<String>();
+		List<ClassFile> annotatedClasses = new ArrayList<ClassFile>();
 
 		for (InputStream stream : getClassFiles(filter)) {
-			ClassFile classFile = new ClassFile(new DataInputStream(stream));
+			DataInputStream inputStream = new DataInputStream(
+					new BufferedInputStream(stream));
+			try {
+				ClassFile classFile = new ClassFile(inputStream);
 
-			Set<Annotation> annotations = new HashSet<Annotation>();
+				Set<Annotation> annotations = new HashSet<Annotation>();
 
-			AnnotationsAttribute visibleAnnotataion = (AnnotationsAttribute) classFile
-					.getAttribute(AnnotationsAttribute.visibleTag);
-			AnnotationsAttribute invisibleAnnotataion = (AnnotationsAttribute) classFile
-					.getAttribute(AnnotationsAttribute.invisibleTag);
+				AnnotationsAttribute visibleAnnotataion = (AnnotationsAttribute) classFile
+						.getAttribute(AnnotationsAttribute.visibleTag);
+				AnnotationsAttribute invisibleAnnotataion = (AnnotationsAttribute) classFile
+						.getAttribute(AnnotationsAttribute.invisibleTag);
 
-			if (visibleAnnotataion != null) {
-				annotations.addAll(Arrays.asList(visibleAnnotataion
-						.getAnnotations()));
-			}
-
-			if (invisibleAnnotataion != null) {
-				annotations.addAll(Arrays.asList(invisibleAnnotataion
-						.getAnnotations()));
-			}
-
-			for (Annotation a : annotations) {
-				if (annotation.getName().equals(a.getTypeName())) {
-					annotatedClasses.add(classFile.getName());
+				if (visibleAnnotataion != null) {
+					annotations.addAll(Arrays.asList(visibleAnnotataion
+							.getAnnotations()));
 				}
+
+				if (invisibleAnnotataion != null) {
+					annotations.addAll(Arrays.asList(invisibleAnnotataion
+							.getAnnotations()));
+				}
+
+				for (Annotation a : annotations) {
+					if (annotation.getName().equals(a.getTypeName())) {
+						annotatedClasses.add(classFile);
+					}
+				}
+			} finally {
+				inputStream.close();
+				stream.close();
 			}
 		}
 
 		return annotatedClasses;
 	}
 
-	@Override
-	public List<String> discoverAnnotatedMethods(String className,
+	public List<String> discoverAnnotatedMethods(ClassFile cf,
 			Class<? extends java.lang.annotation.Annotation> annotation)
 			throws Exception {
 		List<String> annotatedMethods = new ArrayList<String>();
 
-		ClassFile classFile = classPool.get(className).getClassFile();
-		for (MethodInfo info : (List<MethodInfo>) classFile.getMethods()) {
+		for (MethodInfo info : (List<MethodInfo>) cf.getMethods()) {
 			Set<Annotation> annotations = new HashSet<Annotation>();
 
 			AnnotationsAttribute visibleAnnotataion = (AnnotationsAttribute) info
@@ -127,14 +128,12 @@ public class StrutsAnnotationDiscoverer implements AnnotationDiscoverer {
 		return annotatedMethods;
 	}
 
-	@Override
-	public List<String> discoverAnnotatedFields(String className,
+	public List<String> discoverAnnotatedFields(ClassFile cf,
 			Class<? extends java.lang.annotation.Annotation> annotation)
 			throws Exception {
 		List<String> annotatedFields = new ArrayList<String>();
 
-		ClassFile classFile = classPool.get(className).getClassFile();
-		for (FieldInfo info : (List<FieldInfo>) classFile.getFields()) {
+		for (FieldInfo info : (List<FieldInfo>) cf.getFields()) {
 			Set<Annotation> annotations = new HashSet<Annotation>();
 
 			AnnotationsAttribute visibleAnnotataion = (AnnotationsAttribute) info
@@ -169,8 +168,6 @@ public class StrutsAnnotationDiscoverer implements AnnotationDiscoverer {
 		UrlSet urlSet = ClasspathUtil.getUrlSet();
 
 		for (URL url : urlSet.getUrls()) {
-			classPool.appendClassPath(url.getPath());
-
 			String urlString = url.toString();
 			if (urlString.endsWith("!/")) {
 				urlString = urlString.substring(4);
@@ -204,13 +201,6 @@ public class StrutsAnnotationDiscoverer implements AnnotationDiscoverer {
 		List<File> files = new ArrayList<File>();
 
 		if (dir.isDirectory()) {
-			FileFilter filter = new FileFilter() {
-				@Override
-				public boolean accept(File pathname) {
-					return test.test(pathname.getPath());
-				}
-			};
-
 			for (File f : dir.listFiles()) {
 				if (!f.isDirectory() && test.test(f.getPath())) {
 					files.add(f);
@@ -223,29 +213,4 @@ public class StrutsAnnotationDiscoverer implements AnnotationDiscoverer {
 
 		return files;
 	}
-
-	// protected UrlSet getUrlSet(ClassLoaderInterface loaderInterface)
-	// throws IOException {
-	// UrlSet urlSet = new UrlSet(getClassLoaderInterface());
-	// urlSet.excludeJavaEndorsedDirs();
-	// urlSet.excludeJavaExtDirs();
-	//
-	// return urlSet;
-	// }
-	//
-	// protected ClassLoaderInterface getClassLoaderInterface() {
-	// ClassLoaderInterface classLoaderInterface = null;
-	// ActionContext ctx = ActionContext.getContext();
-	// if (ctx != null)
-	// classLoaderInterface = (ClassLoaderInterface) ctx
-	// .get(ClassLoaderInterface.CLASS_LOADER_INTERFACE);
-	//
-	// return (ClassLoaderInterface) ObjectUtils.defaultIfNull(
-	// classLoaderInterface, new ClassLoaderInterfaceDelegate(
-	// getClassLoader()));
-	// }
-	//
-	// protected ClassLoader getClassLoader() {
-	// return Thread.currentThread().getContextClassLoader();
-	// }
 }

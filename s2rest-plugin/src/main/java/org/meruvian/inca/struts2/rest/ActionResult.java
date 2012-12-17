@@ -59,11 +59,11 @@ public class ActionResult {
 		return this;
 	}
 
-	public Map<String, String> getParameter() {
+	public Map<String, String> getParameters() {
 		return parameters;
 	}
 
-	public ActionResult setParameter(Map<String, String> parameters) {
+	public ActionResult setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
 
 		return this;

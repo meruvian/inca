@@ -18,6 +18,7 @@ package org.meruvian.inca.struts2.rest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -48,7 +49,6 @@ public class RestActionInvocation extends DefaultActionInvocation implements
 
 	public static final String SECRET_RESULT = "SECRET_RESULT";
 	public static final String ACTION_RESULT = "ACTION_RESULT";
-	public static final String ACTION_DETAILS = "ACTION_DETAILS";
 
 	private static String secretResult = "";
 
@@ -95,7 +95,7 @@ public class RestActionInvocation extends DefaultActionInvocation implements
 		} else if (methodResult instanceof ActionResult) {
 			this.actionResult = (ActionResult) methodResult;
 
-			return secretResult = Long.toString(System.currentTimeMillis());
+			return secretResult = UUID.randomUUID().toString();
 		} else {
 			return (String) methodResult;
 		}
@@ -112,12 +112,9 @@ public class RestActionInvocation extends DefaultActionInvocation implements
 			return result;
 		}
 
-		invocationContext.put(ACTION_DETAILS, details);
 		if (actionResult != null && secretResult.equals(resultCode)) {
 			invocationContext.put(SECRET_RESULT, secretResult);
 			invocationContext.put(ACTION_RESULT, actionResult);
-
-			return super.createResult();
 		}
 
 		return super.createResult();

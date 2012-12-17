@@ -15,10 +15,6 @@
  */
 package org.meruvian.inca.struts2.rest.discoverer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.meruvian.inca.struts2.rest.commons.RestConstants;
 
 import com.opensymphony.xwork2.inject.Inject;
@@ -29,22 +25,15 @@ import com.opensymphony.xwork2.util.finder.Test;
  * 
  */
 public class AnnotationClasspathFilter implements Test<String> {
-
-	private transient String[] ignoredPackages = { "javax", "java", "sun",
-			"com.sun", "javassist" };
-	private transient String[] includePackages = {};
+	private String[] actionPackages = { "action", "actions", "controller",
+			"controllers" };
 
 	@Inject
 	public AnnotationClasspathFilter(
-			@Inject(RestConstants.INCA_PACKAGE_LOCATORS) String excludePackage,
-			@Inject(RestConstants.INCA_EXCLUDE_PACKAGE_PREFIX) String packageLocators) {
+			@Inject(RestConstants.INCA_PACKAGE_LOCATORS) String packageLocator) {
+		String[] packageLocators = packageLocator.split("\\s*[,]\\s*");
 
-		List<String> excluded = new ArrayList<String>();
-		excluded.addAll(Arrays.asList(ignoredPackages));
-		excluded.addAll(Arrays.asList(excludePackage.split("\\s*[,]\\s*")));
-		ignoredPackages = excluded.toArray(new String[0]);
-
-		includePackages = packageLocators.split("\\s*[,]\\s*");
+		if (packageLocators.length > 0) actionPackages = packageLocators;
 	}
 
 	@Override
@@ -53,9 +42,7 @@ public class AnnotationClasspathFilter implements Test<String> {
 			if (filename.startsWith("/")) {
 				filename = filename.substring(1);
 			}
-			if (match(filename.replace('/', '.'))) {
-				return true;
-			}
+			if (match(filename.replace('/', '.').replace(".class", ""))) { return true; }
 		}
 
 		return false;
@@ -66,21 +53,13 @@ public class AnnotationClasspathFilter implements Test<String> {
 	 * @return
 	 */
 	private boolean match(String replace) {
-
-		for (String ignored : ignoredPackages) {
-			if (replace.startsWith(ignored + "."))
-				return false;
+		for (String include : actionPackages) {
+			if (replace.startsWith(include + ".")) return true;
+			if (replace.substring(0, replace.lastIndexOf('.'))
+					.endsWith(include)) return true;
+			if (replace.contains(include + ".")) return true;
 		}
 
-		// for (String include : includePackages) {
-		// if (replace.lastIndexOf(".") >= 0) {
-		// String r = replace.substring(0, replace.lastIndexOf("."));
-		// if (r.endsWith(include))
-		// return true;
-		// }
-		// }
-
-		return true;
+		return false;
 	}
-
 }

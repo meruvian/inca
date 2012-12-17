@@ -13,14 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.meruvian.inca.struts2.rest.discoverer;
+package org.meruvian.inca.struts2.rest.annotation;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * @author Dian Aditya
  * 
  */
-public interface ActionFinder {
-	ActionDetails findAction(String namespace, String action, String httpMethod);
-
-	ActionDetails findActionClass(String className);
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE })
+public @interface ParentPackage {
+	String value();
 }

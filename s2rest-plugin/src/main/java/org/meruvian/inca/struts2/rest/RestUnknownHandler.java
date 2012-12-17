@@ -18,8 +18,11 @@ package org.meruvian.inca.struts2.rest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.struts2.ServletActionContext;
+import org.apache.struts2.util.RegexPatternMatcher;
 import org.meruvian.inca.struts2.rest.annotation.Action;
 import org.meruvian.inca.struts2.rest.annotation.ExceptionMapping;
 import org.meruvian.inca.struts2.rest.annotation.ExceptionMappings;
@@ -65,6 +68,8 @@ public class RestUnknownHandler implements UnknownHandler {
 	protected Configuration configuration;
 	protected PackageConfig parentPackage;
 	protected ObjectFactory objectFactory;
+	protected ActionDetails details;
+	private RegexPatternMatcher matcher = new RegexPatternMatcher();
 
 	@Inject
 	public RestUnknownHandler(
@@ -78,10 +83,13 @@ public class RestUnknownHandler implements UnknownHandler {
 				.getInstance(String.class, RestConstants.INCA_ACTION_FINDER));
 		this.configuration = cont.getInstance(Configuration.class);
 		this.objectFactory = cont.getInstance(ObjectFactory.class);
-		this.parentPackage = configuration
-				.getPackageConfig(defaultParentPackage);
+		setParentPackage(defaultParentPackage);
+	}
 
-		if (parentPackage == null) {
+	protected void setParentPackage(String parentPackage) {
+		this.parentPackage = configuration.getPackageConfig(parentPackage);
+
+		if (this.parentPackage == null) {
 			throw new ConfigurationException("Unknown default parent package ["
 					+ defaultParentPackage + "]");
 		}
@@ -90,14 +98,18 @@ public class RestUnknownHandler implements UnknownHandler {
 	@Override
 	public ActionConfig handleUnknownAction(String namespace, String actionName)
 			throws XWorkException {
-
 		namespace = StringUtils.prependWithSlash(namespace);
 		actionName = StringUtils.prependWithSlash(actionName);
-		ActionDetails details = actionFinder.findAction(namespace, actionName,
+		details = actionFinder.findAction(namespace, actionName,
 				ServletActionContext.getRequest().getMethod());
 
 		if (details == null) {
 			return null;
+		}
+
+		if (details.getParentPackage() != null) {
+			defaultParentPackage = details.getParentPackage();
+			setParentPackage(defaultParentPackage);
 		}
 
 		String actionClass = details.getActionClass().getName();
@@ -119,15 +131,29 @@ public class RestUnknownHandler implements UnknownHandler {
 
 	private void buildParam(Builder builder, Param param,
 			Map<String, String> params) {
+		String paramValue = param.value();
 
-		String paramName = param.value();
-
-		if (paramName.startsWith("{") && paramName.endsWith("}")) {
-			String paramId = paramName.substring(1, paramName.length() - 1);
-			builder.addParam(param.name(), params.get(paramId));
-			params.remove(paramId);
-		} else {
+		if (matcher.isLiteral(paramValue)) {
 			builder.addParam(param.name(), param.value());
+		} else {
+			Pattern p = Pattern.compile("\\{(.*?)\\}");
+			Matcher m = p.matcher(paramValue);
+
+			StringBuilder sb = new StringBuilder();
+			int i = 0;
+			for (int j = 1; m.find(); j++) {
+				String replacement = params.get(m.group(1));
+
+				sb.append(paramValue.substring(i, m.start()));
+				if (replacement == null)
+					sb.append(m.group(0));
+				else {
+					sb.append(replacement);
+				}
+				i = m.end();
+			}
+			sb.append(paramValue.substring(i, paramValue.length()));
+			builder.addParam(param.name(), sb.toString());
 		}
 	}
 
@@ -203,21 +229,20 @@ public class RestUnknownHandler implements UnknownHandler {
 				.get(RestActionInvocation.SECRET_RESULT);
 
 		ResultConfig.Builder builder = null;
-		ActionDetails actionDetails;
+
 		if (resultCode.equals(secretResult)) {
 			ActionResult result = (ActionResult) actionContext
 					.get(RestActionInvocation.ACTION_RESULT);
 
 			ResultTypeConfig config = results.get(result.getType());
 			builder = new ResultConfig.Builder(null, config.getClassName())
-					.addParams(result.getParameter()).addParam(
+					.addParams(result.getParameters()).addParam(
 							config.getDefaultResultParam(),
 							result.getLocation());
-
-		} else if ((actionDetails = (ActionDetails) actionContext
-				.get(RestActionInvocation.ACTION_DETAILS)) != null) {
-			Map<String, org.meruvian.inca.struts2.rest.annotation.Result> actionResults = actionDetails
+		} else if (details != null) {
+			Map<String, org.meruvian.inca.struts2.rest.annotation.Result> actionResults = details
 					.getActionResults();
+
 			org.meruvian.inca.struts2.rest.annotation.Result actionResult;
 			if ((actionResult = actionResults.get(resultCode)) != null) {
 				ResultTypeConfig config = results.get(actionResult.type());

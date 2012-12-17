@@ -18,6 +18,8 @@ package org.meruvian.inca.struts2.rest.discoverer;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
+import javassist.bytecode.ClassFile;
+
 /**
  * Provides functionality for discovering annotation at runtime
  * 
@@ -31,7 +33,7 @@ public interface AnnotationDiscoverer {
 	 * @return The list of annotated classes
 	 * @throws Exception
 	 */
-	List<String> discoverClassesForAnnotation(
+	List<ClassFile> discoverClassesForAnnotation(
 			Class<? extends Annotation> annotation) throws Exception;
 
 	/**
@@ -41,7 +43,7 @@ public interface AnnotationDiscoverer {
 	 * @return The list of annotated methods from specified class
 	 * @throws Exception
 	 */
-	List<String> discoverAnnotatedMethods(String className,
+	List<String> discoverAnnotatedMethods(ClassFile classFile,
 			Class<? extends Annotation> annotation) throws Exception;
 
 	/**
@@ -51,7 +53,6 @@ public interface AnnotationDiscoverer {
 	 * @return The list of annotated fields from specified class
 	 * @throws Exception
 	 */
-	List<String> discoverAnnotatedFields(String className,
+	List<String> discoverAnnotatedFields(ClassFile classFile,
 			Class<? extends Annotation> annotation) throws Exception;
-
 }

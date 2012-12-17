@@ -35,6 +35,7 @@ public class ActionDetails {
 	private Map<String, Result> actionResults = new HashMap<String, Result>();
 	private Interceptors interceptors;
 	private ExceptionMappings exceptions;
+	private String parentPackage;
 	private String namespace;
 	private String action;
 	private HttpMethod httpMethod;
@@ -96,6 +97,14 @@ public class ActionDetails {
 
 	public void setExceptionMappings(ExceptionMappings exceptions) {
 		this.exceptions = exceptions;
+	}
+
+	public String getParentPackage() {
+		return parentPackage;
+	}
+
+	public void setParentPackage(String parentPackage) {
+		this.parentPackage = parentPackage;
 	}
 
 	public String getNamespace() {

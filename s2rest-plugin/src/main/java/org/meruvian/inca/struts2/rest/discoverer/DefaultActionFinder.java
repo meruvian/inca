@@ -16,30 +16,23 @@
 package org.meruvian.inca.struts2.rest.discoverer;
 
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.CtField;
-import javassist.CtMethod;
-import javassist.CtNewMethod;
+import javassist.bytecode.ClassFile;
 
 import org.apache.struts2.StrutsConstants;
 import org.meruvian.inca.struts2.rest.annotation.Action;
 import org.meruvian.inca.struts2.rest.annotation.Action.HttpMethod;
-import org.meruvian.inca.struts2.rest.annotation.ActionParam;
 import org.meruvian.inca.struts2.rest.annotation.ExceptionMappings;
 import org.meruvian.inca.struts2.rest.annotation.Interceptors;
+import org.meruvian.inca.struts2.rest.annotation.ParentPackage;
 import org.meruvian.inca.struts2.rest.annotation.Result;
 import org.meruvian.inca.struts2.rest.annotation.Results;
 import org.meruvian.inca.struts2.rest.commons.ActionUtils;
-import org.meruvian.inca.struts2.rest.commons.ClasspathUtil;
 import org.meruvian.inca.struts2.rest.commons.RestConstants;
-import org.meruvian.inca.struts2.rest.commons.StringUtils;
 
 import com.opensymphony.xwork2.inject.Container;
 import com.opensymphony.xwork2.inject.Inject;
@@ -53,75 +46,60 @@ import com.opensymphony.xwork2.util.finder.Test;
 public class DefaultActionFinder implements ActionFinder {
 
 	private Test<String> filter;
+	@SuppressWarnings("rawtypes")
 	private PatternMatcher patternMatcher;
 
 	private Map<ActionDetails, ActionDetails> actionForRequest;
 	private Map<String, ActionDetails> actionForClassName;
-	private ClassPool pool;
 	private StrutsAnnotationDiscoverer discoverer;
 
 	private Map<String, Class<?>> actionClasses = new HashMap<String, Class<?>>();
 
 	@Inject
+	@SuppressWarnings("unchecked")
 	public DefaultActionFinder(Container container) throws Exception {
-		this.filter = container.getInstance(Test.class, container.getInstance(
+		filter = container.getInstance(Test.class, container.getInstance(
 				String.class, RestConstants.INCA_ACTION_FILTER));
-		this.patternMatcher = container.getInstance(PatternMatcher.class,
-				container.getInstance(String.class,
+		patternMatcher = container.getInstance(PatternMatcher.class, container
+				.getInstance(String.class,
 						StrutsConstants.STRUTS_PATTERNMATCHER));
-		this.pool = ClassPool.getDefault();
-		for (URL url : ClasspathUtil.getUrlSet().getUrls()) {
-			this.pool.appendClassPath(url.getPath());
-		}
-
-		this.discoverer = new StrutsAnnotationDiscoverer(filter);
+		discoverer = new StrutsAnnotationDiscoverer(filter);
 
 		actionForClassName = new HashMap<String, ActionDetails>();
 		actionForRequest = new ActionPool(patternMatcher);
 
-		List<String> annotatedClasses = discoverer
+		List<ClassFile> annotatedClasses = discoverer
 				.discoverClassesForAnnotation(Action.class);
-		for (String classname : annotatedClasses) {
-			buildActionFromMethod(classname);
-		}
+		for (ClassFile classFile : annotatedClasses)
+			buildActionFromMethod(classFile);
 	}
 
-	protected void buildActionFromMethod(String classname) throws Exception {
-		List<String> methods = discoverer.discoverAnnotatedMethods(classname,
+	protected void buildActionFromMethod(ClassFile classFile) throws Exception {
+		List<String> methods = discoverer.discoverAnnotatedMethods(classFile,
 				Action.class);
 
-		CtClass actionclass = pool.get(classname);
-
-		// Create proxyObject
-		actionclass.setName(classname + "$$$ActionProxy");
-		actionclass.setSuperclass(pool.get(classname));
-
-		buildClassProperty(classname, actionclass);
-
-		Class actionClass = actionclass.toClass();
+		Class<?> actionClass = Class.forName(classFile.getName());
 
 		for (String method : methods) {
 			ActionDetails details = buildActionDetails(actionClass, method);
 
-			// actionForRequest.put(details.getRequestUri(), details);
 			actionForRequest.put(details, details);
-			actionForClassName.put(actionclass.getName(), details);
+			actionForClassName.put(actionClass.getName(), details);
 		}
 
 		{
 			ActionDetails details = buildActionDetails(actionClass, null);
 
 			actionForRequest.put(details, details);
-			actionForClassName.put(actionclass.getName(), details);
+			actionForClassName.put(actionClass.getName(), details);
 		}
 	}
 
-	private ActionDetails buildActionDetails(Class actionClass,
+	private ActionDetails buildActionDetails(Class<?> actionClass,
 			String actionMethod) throws Exception {
 
-		if (actionMethod == null) {
+		if (actionMethod == null)
 			actionMethod = "execute";
-		}
 
 		Class<?> cachedActionClass = actionClasses.get(actionClass.getName());
 
@@ -150,6 +128,8 @@ public class DefaultActionFinder implements ActionFinder {
 				Results.class);
 		Results methodResults = ActionUtils.findAnnotation(actionMethodClass,
 				Results.class);
+		ParentPackage parentPackage = ActionUtils.findAnnotation(
+				cachedActionClass, ParentPackage.class);
 
 		ActionDetails details = new ActionDetails();
 
@@ -161,6 +141,8 @@ public class DefaultActionFinder implements ActionFinder {
 			details.setActionAnnotation(methodAnnotation);
 		}
 
+		details.setParentPackage(parentPackage == null ? null : parentPackage
+				.value());
 		details.setActionClass(cachedActionClass);
 		details.setNamespace(ActionUtils.getUriFromAnnotation(classAnnotation));
 		details.setAction(ActionUtils.getUriFromAnnotation(methodAnnotation));
@@ -168,41 +150,15 @@ public class DefaultActionFinder implements ActionFinder {
 		details.setInterceptors(interceptors);
 		details.setExceptionMappings(exceptionMappings);
 
-		if (actionResults != null) {
-			for (Result result : actionResults.value()) {
+		if (actionResults != null)
+			for (Result result : actionResults.value())
 				details.getActionResults().put(result.name(), result);
-			}
-		}
 
-		if (methodResults != null) {
-			for (Result result : methodResults.value()) {
+		if (methodResults != null)
+			for (Result result : methodResults.value())
 				details.getActionResults().put(result.name(), result);
-			}
-		}
 
 		return details;
-	}
-
-	public void buildClassProperty(String classname, CtClass actionClass)
-			throws Exception {
-		List<String> fields = discoverer.discoverAnnotatedFields(classname,
-				ActionParam.class);
-
-		for (String fieldName : fields) {
-			CtField field = actionClass.getDeclaredField(fieldName);
-			ActionParam param = (ActionParam) field
-					.getAnnotation(ActionParam.class);
-
-			String fieldValue = param.value();
-
-			CtMethod getter = CtNewMethod.getter(
-					"get" + StringUtils.toCamelCase(fieldValue), field);
-			CtMethod setter = CtNewMethod.setter(
-					"set" + StringUtils.toCamelCase(fieldValue), field);
-
-			actionClass.addMethod(getter);
-			actionClass.addMethod(setter);
-		}
 	}
 
 	@Override
@@ -220,27 +176,45 @@ public class DefaultActionFinder implements ActionFinder {
 		return actionForClassName.get(className);
 	}
 
+	@SuppressWarnings("serial")
 	protected static class ActionPool extends
 			LinkedHashMap<ActionDetails, ActionDetails> {
 
+		@SuppressWarnings("rawtypes")
 		private PatternMatcher patternMatcher;
 
+		@SuppressWarnings("rawtypes")
 		public ActionPool(PatternMatcher patternMatcher) {
 			this.patternMatcher = patternMatcher;
 		}
 
 		private boolean httpMethodMatch(ActionDetails details,
 				ActionDetails request) {
-			return (HttpMethod.ALL.equals(details.getHttpMethod()) || request
-					.getHttpMethod().equals(details.getHttpMethod()));
+			return HttpMethod.ALL.equals(details.getHttpMethod())
+					|| request.getHttpMethod().equals(details.getHttpMethod());
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		public ActionDetails get(Object key) {
 			if (key == null || !(key instanceof ActionDetails))
 				return null;
 
 			ActionDetails detailsKey = (ActionDetails) key;
+
+			for (java.util.Map.Entry<ActionDetails, ActionDetails> e : entrySet()) {
+				ActionDetails details = e.getKey();
+
+				if (patternMatcher.isLiteral(details.getRequestUri())) {
+					if (details.getRequestUri().equals(
+							detailsKey.getRequestUri())) {
+						if (httpMethodMatch(details, detailsKey)) {
+							return e.getValue();
+						}
+					}
+				}
+			}
+
 			for (java.util.Map.Entry<ActionDetails, ActionDetails> e : entrySet()) {
 				ActionDetails details = e.getKey();
 
@@ -248,16 +222,15 @@ public class DefaultActionFinder implements ActionFinder {
 						.getRequestUri());
 
 				Map<String, String> map = new HashMap<String, String>();
-				if (details.getRequestUri().equals(detailsKey.getRequestUri())) {
-					if (httpMethodMatch(details, detailsKey))
-						return e.getValue();
-				} else if (patternMatcher.match(map,
-						detailsKey.getRequestUri(), o)) {
-					if (httpMethodMatch(details, detailsKey)) {
-						details = e.getValue();
-						details.setParameter(map);
+				if (!patternMatcher.isLiteral(details.getRequestUri())) {
+					if (patternMatcher
+							.match(map, detailsKey.getRequestUri(), o)) {
+						if (httpMethodMatch(details, detailsKey)) {
+							details = e.getValue();
+							details.setParameter(map);
 
-						return details;
+							return details;
+						}
 					}
 				}
 			}
@@ -265,5 +238,4 @@ public class DefaultActionFinder implements ActionFinder {
 			return null;
 		}
 	}
-
 }

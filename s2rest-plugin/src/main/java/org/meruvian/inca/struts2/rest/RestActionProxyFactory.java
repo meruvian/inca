@@ -37,8 +37,6 @@ public class RestActionProxyFactory extends DefaultActionProxyFactory {
 		ActionProxy proxy = createActionProxy(inv, namespace, actionName,
 				methodName, executeResult, cleanupContext);
 
-		// proxy.getConfig().getResults().put("", R)
-
 		return proxy;
 	}
 
