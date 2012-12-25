@@ -20,7 +20,7 @@
 		p:dataSource-ref="dataSource" p:persistenceProviderClass="org.hibernate.ejb.HibernatePersistence">
 		<property name="jpaProperties">
 			<props>
-				<prop key="hibernate.dialect">org.hibernate.dialect.DerbyDialect</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.DerbyTenSevenDialect</prop>
 				<prop key="hibernate.hbm2ddl.auto">update</prop>
 				<prop key="hibernate.show_sql">true</prop>
 			</props>

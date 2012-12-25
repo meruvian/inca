@@ -23,7 +23,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import org.meruvian.inca.s2rest.showcase.entity.Articles;
+import org.meruvian.inca.s2rest.showcase.entity.Article;
 import org.meruvian.yama.persistence.EntityListWrapper;
 import org.meruvian.yama.persistence.access.PersistenceDAO;
 import org.springframework.stereotype.Repository;
@@ -33,15 +33,15 @@ import org.springframework.stereotype.Repository;
  * 
  */
 @Repository
-public class ArticleDao extends PersistenceDAO<Articles> {
+public class ArticleDao extends PersistenceDAO<Article> {
 
-	public EntityListWrapper<Articles> articles(int year, int month, int date) {
-		EntityListWrapper<Articles> articles = new EntityListWrapper<Articles>();
+	public EntityListWrapper<Article> articles(int year, int month, int date) {
+		EntityListWrapper<Article> articles = new EntityListWrapper<Article>();
 
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-		CriteriaQuery<Articles> query = cb.createQuery(entityClass);
+		CriteriaQuery<Article> query = cb.createQuery(entityClass);
 
-		Root<Articles> root = query.from(entityClass);
+		Root<Article> root = query.from(entityClass);
 		List<Predicate> predicates = new ArrayList<Predicate>();
 
 		if (year > 0) {
@@ -56,7 +56,7 @@ public class ArticleDao extends PersistenceDAO<Articles> {
 			predicates.add(cb.equal(root.get("publishDate"), date));
 		}
 
-		CriteriaQuery<Articles> entities = query.select(root);
+		CriteriaQuery<Article> entities = query.select(root);
 		entities.where(predicates.toArray(new Predicate[0]));
 		entities.orderBy(cb.asc(root.get("publishYear")),
 				cb.asc(root.get("publishMonth")),

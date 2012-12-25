@@ -16,22 +16,22 @@
 	</tr>
 </table>
 
-<div class="modal hide" id="source">
+<div class="modal hide fade" id="source">
 	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal">x</button>
+		<button type="button" class="close" data-dismiss="modal">&times;</button>
 		<h3>Source</h3>
 	</div>
 	<div class="modal-body">
 		<pre class="brush: java">
 @Action(name = "/articles")
 @Results({ @Result(name = "list", location = "/WEB-INF/view/article/article-list.jsp") })
-public class ArticleAction {
+public class ArticleAction implements ModelDriven&lt;ArticleActionModel&gt; {
 	...
 	
 	@Action(name = "/form", method = HttpMethod.POST)
 	public ActionResult submit() {
-		service.save(articles);
-		url = "/articles/form";
+		service.save(model.getArticle());
+		model.setUrl("/articles/form");
 
 		return new ActionResult("/WEB-INF/view/article/article-success.jsp");
 	}

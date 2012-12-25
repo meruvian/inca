@@ -16,33 +16,43 @@
 	</tr>
 </table>
 
-<div class="modal hide" id="source">
+<div class="modal hide fade" id="source">
 	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal">x</button>
+		<button type="button" class="close" data-dismiss="modal">&times;</button>
 		<h3>Source</h3>
 	</div>
 	<div class="modal-body">
 		<pre class="brush: java">
 @Action(name = "/articles")
 @Results({ @Result(name = "list", location = "/WEB-INF/view/article/article-list.jsp") })
-public class ArticleAction {
+public class ArticleAction implements ModelDriven&lt;ArticleActionModel&gt; {
 	...
 	
 	@Action(name = "/form", method = HttpMethod.GET)
 	public ActionResult form() {
-		url = "/articles/form";
+		model.setUrl("/articles/form");
 
 		return new ActionResult("/WEB-INF/view/article/article-form.jsp");
 	}
 	
 	...
 }
+
+public class ArticleActionModel {
+	private int year;
+	private int month;
+	private int date;
+	private Article article = new Article();
+	private String url;
+	
+	// getters and setters
+}
 		</pre>
 	</div>
 </div>
 
 <div>
-	<s:form cssClass="form-horizontal" method="post">
+	<s:form cssClass="form" method="post">
 		<div class="control-group">
 			<label class="control-label" for="title">Title</label>
 			<div class="controls">

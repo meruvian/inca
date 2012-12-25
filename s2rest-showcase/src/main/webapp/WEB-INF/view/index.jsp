@@ -107,7 +107,7 @@
 		<div id="loading">
 			<div id="loading-dialog"><img src="<s:url value="/images/loading.gif" />" /></div>
 		</div>
-		<div class="navbar navbar-fixed-top">
+		<div class="navbar navbar-inverse navbar-fixed-top">
 			<div class="navbar-inner">
 				<div class="container-fluid">
 					<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
@@ -129,7 +129,7 @@
 		<div class="container-fluid">
 			<div class="row-fluid">
 				<div class="span3">
-					<div class="well sidebar-nav">
+					<div class="well sidebar-nav span3" data-spy="affix" data-offset-top="0">
 						<ul class="nav nav-list">
 							<li class="nav-header"><s:text name="sidebar.title" /></li>
 							<li><a href="#/simple">Simple Action</a></li>
@@ -144,10 +144,9 @@
 				</div><!--/span-->
 			</div><!--/row-->
 
-			<hr>
-
+			<br />
 			<footer class="footer modal-footer">
-				<p>Inca S2Rest v1.0.1</p>
+				<p>Inca S2Rest v1.0.2</p>
 				<p>&copy; 2012 - <strong><a href="http://www.meruvian.org" target="_blank">Meruvian</a></strong></p>
 			</footer>
 

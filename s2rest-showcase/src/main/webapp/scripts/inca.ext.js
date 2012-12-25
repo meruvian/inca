@@ -93,7 +93,7 @@
 			}
 		});
 		
-		SyntaxHighlighter.all();
+		SyntaxHighlighter.highlight();
 	};
 })(window);
 

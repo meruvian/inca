@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.meruvian.inca.s2rest.showcase.actions;
+package org.meruvian.inca.s2rest.showcase.action;
 
 import org.meruvian.inca.struts2.rest.ActionResult;
 import org.meruvian.inca.struts2.rest.annotation.Action;
-import org.meruvian.inca.struts2.rest.annotation.ActionParam;
 
 /**
  * @author Dian Aditya
@@ -25,11 +24,19 @@ import org.meruvian.inca.struts2.rest.annotation.ActionParam;
  */
 @Action(name = "/simple")
 public class SimpleAction {
-	
-	@ActionParam("url")
+
 	private String url = "/simple";
-	
-	public ActionResult execute() {
+
+	@Action
+	public ActionResult index() {
 		return new ActionResult("/WEB-INF/view/simple/simple-index.jsp");
+	}
+
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }

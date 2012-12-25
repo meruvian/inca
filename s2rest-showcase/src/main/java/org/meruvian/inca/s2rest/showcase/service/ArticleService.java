@@ -16,7 +16,7 @@
 package org.meruvian.inca.s2rest.showcase.service;
 
 import org.meruvian.inca.s2rest.showcase.dao.ArticleDao;
-import org.meruvian.inca.s2rest.showcase.entity.Articles;
+import org.meruvian.inca.s2rest.showcase.entity.Article;
 import org.meruvian.yama.persistence.EntityListWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,20 +29,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class ArticleService {
-	
+
 	@Autowired
 	private ArticleDao dao;
 
 	@Transactional(readOnly = true)
-	public Articles findById(String id) {
+	public Article findById(String id) {
 		return dao.findById(id);
 	}
 
-	public EntityListWrapper<Articles> articles(int year, int month, int date) {
+	public EntityListWrapper<Article> articles(int year, int month, int date) {
 		return dao.articles(year, month, date);
 	}
-	
-	public void save(Articles articles) {
-		dao.persist(articles);
+
+	public void save(Article article) {
+		dao.persist(article);
 	}
 }

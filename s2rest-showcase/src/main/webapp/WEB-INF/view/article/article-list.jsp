@@ -16,63 +16,48 @@
 	</tr>
 </table>
 
-<div class="modal hide" id="source">
+<div class="modal hide fade" id="source">
 	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal">x</button>
+		<button type="button" class="close" data-dismiss="modal">&times;</button>
 		<h3>Source</h3>
 	</div>
 	<div class="modal-body">
 		<pre class="brush: java">
 @Action(name = "/articles")
 @Results({ @Result(name = "list", location = "/WEB-INF/view/article/article-list.jsp") })
-public class ArticleAction {
-	@ActionParam("year")
-	private int year;
-
-	@ActionParam("month")
-	private int month;
-
-	@ActionParam("date")
-	private int date;
-
-	@ActionParam("article")
-	private Articles articles = new Articles();
-
-	@ActionParam("model")
-	protected Object model = new HashMap&lt;String, Object&gt;();
-
-	@ActionParam("url")
-	protected String url;
-	
+public class ArticleAction implements ModelDriven&lt;ArticleActionModel&gt; {
 	...
 	
-	public String execute() {
-		model = service.articles(-1, -1, -1);
-		url = "/articles";
+	@Action
+	public String index() {
+		model.setArticles(service.articles(-1, -1, -1));
+		model.setUrl("/articles");
 
 		return "list";
 	}
-	
+
 	@Action(name = "/find/{year}/{month}/{date}")
 	public String articlesByDate() {
-		model = service.articles(year, month, date);
-		url = "/articles/{year}/{month}/{date}";
+		model.setArticles(service.articles(model.getYear(), model.getMonth(),
+				model.getDate()));
+		model.setUrl("/articles/{year}/{month}/{date}");
 
 		return "list";
 	}
 
 	@Action(name = "/find/{year}/{month}")
 	public String articlesByMonth() {
-		model = service.articles(year, month, -1);
-		url = "/articles/{year}/{month}";
+		model.setArticles(service.articles(model.getYear(), model.getMonth(),
+				-1));
+		model.setUrl("/articles/{year}/{month}");
 
 		return "list";
 	}
 
 	@Action(name = "/find/{year}")
 	public String articlesByYear() {
-		model = service.articles(year, -1, -1);
-		url = "/articles/{year}";
+		model.setArticles(service.articles(model.getYear(), -1, -1));
+		model.setUrl("/articles/{year}");
 
 		return "list";
 	}
@@ -85,7 +70,7 @@ public class ArticleAction {
 
 <s:url var="a" value="/articles/find" />
 <div>
-	<s:iterator value="model.entityList">
+	<s:iterator value="articles.entityList">
 	<h2>
 		<s:url value="/articles/read" var="url" />
 		<a href="${url}/${id}">

@@ -16,16 +16,17 @@
 	</tr>
 </table>
 
-<div class="modal hide" id="source">
+<div class="modal hide fade" id="source">
 	<div class="modal-header">
-		<button type="button" class="close" data-dismiss="modal">x</button>
+		<button type="button" class="close" data-dismiss="modal">&times;</button>
 		<h3>Source</h3>
 	</div>
 	<div class="modal-body">
 		<pre class="brush: java">
 @Action(name = "simple")
 public class SimpleAction {
-	public ActionResult execute() {
+	@Action
+	public ActionResult index() {
 		return new ActionResult("/WEB-INF/simple/simple-index.jsp");
 	}
 }

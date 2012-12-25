@@ -28,9 +28,9 @@ import org.meruvian.yama.persistence.DefaultPersistence;
  * 
  */
 @Entity
-@Table(name = "articles")
+@Table(name = "article")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-public class Articles extends DefaultPersistence {
+public class Article extends DefaultPersistence {
 	private String title;
 	private int publishYear;
 	private int publishMonth;

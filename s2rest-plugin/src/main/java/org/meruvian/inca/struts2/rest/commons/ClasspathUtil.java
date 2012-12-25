@@ -17,8 +17,6 @@ package org.meruvian.inca.struts2.rest.commons;
 
 import java.io.IOException;
 
-import org.apache.commons.lang.ObjectUtils;
-
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.util.finder.ClassLoaderInterface;
 import com.opensymphony.xwork2.util.finder.ClassLoaderInterfaceDelegate;
@@ -45,9 +43,8 @@ public class ClasspathUtil {
 			classLoaderInterface = (ClassLoaderInterface) ctx
 					.get(ClassLoaderInterface.CLASS_LOADER_INTERFACE);
 
-		return (ClassLoaderInterface) ObjectUtils.defaultIfNull(
-				classLoaderInterface, new ClassLoaderInterfaceDelegate(
-						classLoader));
+		return classLoaderInterface != null ? classLoaderInterface
+				: new ClassLoaderInterfaceDelegate(classLoader);
 	}
 
 	public static UrlSet getUrlSet() throws IOException {
