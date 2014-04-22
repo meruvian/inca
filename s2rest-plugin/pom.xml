@@ -1,11 +1,10 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<artifactId>inca-s2rest-plugins</artifactId>
 		<groupId>org.meruvian.inca.s2restplugins</groupId>
-		<version>1.1.0-SNAPSHOT</version>
+		<version>1.1.0</version>
 	</parent>
 
 	<artifactId>inca-s2rest-plugin</artifactId>
@@ -13,9 +12,9 @@
 	<description>Includes http method handling with annotation support.</description>
 
 	<scm>
-		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-plugin</connection>
-		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/trunk/s2rest-plugin</developerConnection>
-		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show</url>
+		<connection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/tags/inca-s2rest-plugins-1.1.0/s2rest-plugin</connection>
+		<developerConnection>scm:svn:https://svn.java.net/svn/s2restplugins~s2-rest-svn/tags/inca-s2rest-plugins-1.1.0/s2rest-plugin</developerConnection>
+		<url>http://java.net/projects/s2restplugins/sources/s2-rest-svn/show/tags/inca-s2rest-plugins-1.1.0/show</url>
 	</scm>
 
 	<dependencies>
