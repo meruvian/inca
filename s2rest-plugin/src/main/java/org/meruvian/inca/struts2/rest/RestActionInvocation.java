@@ -15,8 +15,6 @@
  */
 package org.meruvian.inca.struts2.rest;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,14 +23,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import net.sf.cglib.beans.BeanGenerator;
-import net.sf.cglib.proxy.Callback;
-import net.sf.cglib.proxy.CallbackFilter;
-import net.sf.cglib.proxy.Enhancer;
-import net.sf.cglib.proxy.MethodInterceptor;
-import net.sf.cglib.proxy.MethodProxy;
-import net.sf.cglib.proxy.NoOp;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.struts2.StrutsStatics;
 import org.meruvian.inca.struts2.rest.annotation.ActionParam;
 import org.meruvian.inca.struts2.rest.commons.ActionUtils;
@@ -40,7 +31,6 @@ import org.meruvian.inca.struts2.rest.commons.ActionUtils.ActionMethodParameterC
 import org.meruvian.inca.struts2.rest.commons.RestConstants;
 import org.meruvian.inca.struts2.rest.discoverer.ActionDetails;
 import org.meruvian.inca.struts2.rest.discoverer.ActionMethodDetails;
-import org.meruvian.inca.struts2.rest.discoverer.ActionMethodParameterDetails;
 
 import com.opensymphony.xwork2.ActionContext;
 import com.opensymphony.xwork2.ActionProxy;
@@ -48,8 +38,6 @@ import com.opensymphony.xwork2.DefaultActionInvocation;
 import com.opensymphony.xwork2.Result;
 import com.opensymphony.xwork2.config.entities.ActionConfig;
 import com.opensymphony.xwork2.config.entities.InterceptorMapping;
-import com.opensymphony.xwork2.config.entities.ResultConfig;
-import com.opensymphony.xwork2.config.entities.ResultConfig.Builder;
 import com.opensymphony.xwork2.inject.Container;
 import com.opensymphony.xwork2.inject.Inject;
 import com.opensymphony.xwork2.util.logging.Logger;
@@ -151,7 +139,10 @@ public class RestActionInvocation extends DefaultActionInvocation implements
 				.get(StrutsStatics.HTTP_REQUEST);
 
 		if (manager.getProcessorForResponse(request) != null) {
-			return container.inject(RestResult.class);
+			RestResult result = container.inject(RestResult.class);
+			result.setActionResult(actionResult);
+
+			return result;
 		}
 
 		invocationContext.put(SECRET_RESULT, secretResult);
@@ -161,15 +152,15 @@ public class RestActionInvocation extends DefaultActionInvocation implements
 	}
 
 	@Override
-	public String invoke() throws Exception {
-		String invoke = super.invoke();
-		if (invoke != null) {
-			if (invoke.equals(secretResult)) {
+	public String invokeActionOnly() throws Exception {
+		String result = super.invokeActionOnly();
+		if (result != null) {
+			if (result.equals(secretResult)) {
 				stack.push(actionResult.getModel());
 				stack.push(actionResult);
 			}
 		}
 
-		return invoke;
+		return result;
 	}
 }

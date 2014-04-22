@@ -15,9 +15,10 @@
  */
 package org.meruvian.inca.struts2.test;
 
-import org.apache.commons.io.IOUtils;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Test;
+import org.meruvian.inca.struts2.rest.ActionResult;
 import org.meruvian.inca.struts2.test.action.ActionResultModelTestAction;
 
 import com.opensymphony.xwork2.ActionProxy;
@@ -43,9 +44,28 @@ public class ActionResultModelTest extends
 	}
 
 	@Test
+	public void testActionResultTemplate() throws Exception {
+		String output = executeAction("/resultmodel/3");
+
+		Assert.assertEquals("modelFromResult\n\n0\n1\n2\n", output);
+	}
+
+	@Test
 	public void testJsonOutput() throws Exception {
 		request.addHeader("Accept", "application/json");
 
 		String output = executeAction("/resultmodel/4");
+
+		ObjectMapper mapper = new ObjectMapper();
+		String[] arr = new String[4];
+		for (int i = 0; i < 4; i++) {
+			arr[i] = i + "";
+		}
+		ActionResult result = new ActionResult();
+		result.addToModel("modelFromResult", "modelFromResult").addToModel(
+				"arr", arr);
+
+		Assert.assertEquals(mapper.writeValueAsString(result.getModel()),
+				output);
 	}
 }

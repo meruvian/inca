@@ -34,7 +34,7 @@ public class ActionResultModelTestAction {
 			arr[i] = i + "";
 		}
 
-		return new ActionResult("freemarker", "/view/default_test_result.ftl")
+		return new ActionResult("freemarker", "/view/action_result_model.ftl")
 				.addToModel("modelFromResult", "modelFromResult").addToModel(
 						"arr", arr);
 	}

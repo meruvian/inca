@@ -37,7 +37,6 @@ import javassist.bytecode.FieldInfo;
 import javassist.bytecode.MethodInfo;
 import javassist.bytecode.annotation.Annotation;
 
-import org.apache.commons.lang3.AnnotationUtils;
 import org.meruvian.inca.struts2.rest.commons.ActionUtils;
 import org.meruvian.inca.struts2.rest.commons.ClasspathUtil;
 

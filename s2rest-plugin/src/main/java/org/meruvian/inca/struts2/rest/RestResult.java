@@ -15,7 +15,6 @@
  */
 package org.meruvian.inca.struts2.rest;
 
-import java.util.Arrays;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,8 +29,6 @@ import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.ModelDriven;
 import com.opensymphony.xwork2.inject.Container;
 import com.opensymphony.xwork2.inject.Inject;
-import com.opensymphony.xwork2.util.CompoundRoot;
-import com.opensymphony.xwork2.util.ValueStack;
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
 
@@ -43,12 +40,17 @@ public class RestResult extends StrutsResultSupport {
 
 	private Logger LOG = LoggerFactory.getLogger(RestResult.class);
 	private TransformManager manager;
+	private ActionResult actionResult;
 
 	@Inject
 	public RestResult(Container container) {
 		this.manager = container.getInstance(TransformManager.class, container
 				.getInstance(String.class,
 						RestConstants.INCA_REST_TRANSFORM_MANAGER));
+	}
+
+	protected void setActionResult(ActionResult actionResult) {
+		this.actionResult = actionResult;
 	}
 
 	protected void doExecute(String finalLocation, ActionInvocation invocation)
@@ -60,15 +62,24 @@ public class RestResult extends StrutsResultSupport {
 		HttpServletResponse response = (HttpServletResponse) context
 				.get(HTTP_RESPONSE);
 		Object model = invocation.getAction();
+		boolean modelFound = false;
 
-		if (context.get("model") != null) {
-			model = context.get("model");
-		} else if (model instanceof ModelDriven) {
-			model = ((ModelDriven) model).getModel();
-		} else if (model instanceof Map) {
-			Map map = (Map) model;
-			if (map.get("root") != null)
-				model = map.get("root");
+		if (actionResult != null) {
+			if (!actionResult.getModel().isEmpty()) {
+				model = actionResult.getModel();
+
+				modelFound = true;
+			}
+		}
+
+		if (!modelFound) {
+			if (model instanceof ModelDriven) {
+				model = ((ModelDriven) model).getModel();
+			} else if (model instanceof Map) {
+				Map map = (Map) model;
+				if (map.get("root") != null)
+					model = map.get("root");
+			}
 		}
 
 		ResourceTransformer processor = manager
