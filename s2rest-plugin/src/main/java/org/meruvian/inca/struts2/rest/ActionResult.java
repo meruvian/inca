@@ -16,6 +16,7 @@
 package org.meruvian.inca.struts2.rest;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -26,6 +27,9 @@ public class ActionResult {
 	private String type = "dispatcher";
 	private String location;
 	private Map<String, String> parameters = new HashMap<String, String>();
+	private Map<String, Object> model = new LinkedHashMap<String, Object>();
+
+	public static final String ROOT_MODEL = "ROOT";
 
 	public ActionResult() {
 	}
@@ -37,6 +41,17 @@ public class ActionResult {
 	public ActionResult(String type, String location) {
 		this.type = type;
 		this.location = location;
+	}
+
+	public ActionResult(String location, Map<String, Object> model) {
+		this.location = location;
+		this.model = model;
+	}
+
+	public ActionResult(String type, String location, Map<String, Object> model) {
+		this.type = type;
+		this.location = location;
+		this.model = model;
 	}
 
 	public String getType() {
@@ -71,6 +86,20 @@ public class ActionResult {
 
 	public ActionResult addParameter(String key, String value) {
 		parameters.put(key, value);
+
+		return this;
+	}
+
+	public Map<String, Object> getModel() {
+		return model;
+	}
+
+	public void setModel(Map<String, Object> model) {
+		this.model = model;
+	}
+
+	public ActionResult addToModel(String key, Object value) {
+		model.put(key, value);
 
 		return this;
 	}

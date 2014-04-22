@@ -15,6 +15,10 @@
  */
 package org.meruvian.inca.struts2.rest;
 
+import java.lang.reflect.Method;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,19 +26,25 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.struts2.ServletActionContext;
+import org.apache.struts2.interceptor.validation.AnnotationValidationInterceptor;
 import org.apache.struts2.util.RegexPatternMatcher;
 import org.meruvian.inca.struts2.rest.annotation.Action;
+import org.meruvian.inca.struts2.rest.annotation.ActionParam;
 import org.meruvian.inca.struts2.rest.annotation.ExceptionMapping;
 import org.meruvian.inca.struts2.rest.annotation.ExceptionMappings;
 import org.meruvian.inca.struts2.rest.annotation.InterceptorRef;
 import org.meruvian.inca.struts2.rest.annotation.Interceptors;
 import org.meruvian.inca.struts2.rest.annotation.Param;
+import org.meruvian.inca.struts2.rest.commons.ActionUtils;
+import org.meruvian.inca.struts2.rest.commons.ActionUtils.ActionMethodParameterCallback;
 import org.meruvian.inca.struts2.rest.commons.RestConstants;
 import org.meruvian.inca.struts2.rest.commons.StringUtils;
 import org.meruvian.inca.struts2.rest.discoverer.ActionDetails;
 import org.meruvian.inca.struts2.rest.discoverer.ActionFinder;
+import org.meruvian.inca.struts2.rest.discoverer.ActionMethodDetails;
 
 import com.opensymphony.xwork2.ActionContext;
+import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.ObjectFactory;
 import com.opensymphony.xwork2.Result;
 import com.opensymphony.xwork2.UnknownHandler;
@@ -51,6 +61,7 @@ import com.opensymphony.xwork2.config.entities.ResultTypeConfig;
 import com.opensymphony.xwork2.config.providers.InterceptorBuilder;
 import com.opensymphony.xwork2.inject.Container;
 import com.opensymphony.xwork2.inject.Inject;
+import com.opensymphony.xwork2.util.ValueStack;
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
 
@@ -70,6 +81,24 @@ public class RestUnknownHandler implements UnknownHandler {
 	protected ObjectFactory objectFactory;
 	protected ActionDetails details;
 	private RegexPatternMatcher matcher = new RegexPatternMatcher();
+	private Container container;
+
+	private static final Map<Class<?>, Object> primitiveDefaults;
+
+	static {
+		Map<Class<?>, Object> map = new HashMap<Class<?>, Object>();
+		map.put(Boolean.TYPE, Boolean.FALSE);
+		map.put(Byte.TYPE, Byte.valueOf((byte) 0));
+		map.put(Short.TYPE, Short.valueOf((short) 0));
+		map.put(Character.TYPE, new Character((char) 0));
+		map.put(Integer.TYPE, Integer.valueOf(0));
+		map.put(Long.TYPE, Long.valueOf(0L));
+		map.put(Float.TYPE, new Float(0.0f));
+		map.put(Double.TYPE, new Double(0.0));
+		map.put(BigInteger.class, new BigInteger("0"));
+		map.put(BigDecimal.class, new BigDecimal(0.0));
+		primitiveDefaults = Collections.unmodifiableMap(map);
+	}
 
 	@Inject
 	public RestUnknownHandler(
@@ -83,6 +112,7 @@ public class RestUnknownHandler implements UnknownHandler {
 				.getInstance(String.class, RestConstants.INCA_ACTION_FINDER));
 		this.configuration = cont.getInstance(Configuration.class);
 		this.objectFactory = cont.getInstance(ObjectFactory.class);
+		this.container = cont;
 		setParentPackage(defaultParentPackage);
 	}
 
@@ -117,14 +147,19 @@ public class RestUnknownHandler implements UnknownHandler {
 		actionFinder.findActionClass(actionClass).setParameter(
 				details.getParameter());
 
-		Builder builder = new Builder(defaultParentPackage,
-				details.getActionMethod(), actionClass);
-		builder.methodName(details.getActionMethod());
+		Builder builder = new Builder(defaultParentPackage, details
+				.getActionMethodDetails().getActionMethod(), actionClass);
+		builder.methodName(details.getActionMethodDetails().getActionMethod());
 
 		Map<String, String> params = details.getParameter();
 		buildActionParam(builder, details.getActionAnnotation(), params);
 		buildInterceptors(builder, details.getInterceptors(), params);
 		buildExceptionMappings(builder, details.getExceptionMappings(), params);
+
+		ActionContext context = ActionContext.getContext();
+		if (context != null) {
+			context.put(RestConstants.INCA_ACTION_DETAILS, details);
+		}
 
 		return builder.build();
 	}
@@ -141,7 +176,7 @@ public class RestUnknownHandler implements UnknownHandler {
 
 			StringBuilder sb = new StringBuilder();
 			int i = 0;
-			for (int j = 1; m.find(); j++) {
+			for (; m.find();) {
 				String replacement = params.get(m.group(1));
 
 				sb.append(paramValue.substring(i, m.start()));
@@ -176,7 +211,19 @@ public class RestUnknownHandler implements UnknownHandler {
 							.getDefaultInterceptorRef(), null, builder.build()
 							.getLocation(), configuration.getContainer()
 							.getInstance(ObjectFactory.class));
-			builder.addInterceptors(mappings);
+
+			for (InterceptorMapping mapping : mappings) {
+				if (mapping.getInterceptor() instanceof AnnotationValidationInterceptor) {
+					RestAnnotationValidationInterceptor interceptor = container
+							.inject(RestAnnotationValidationInterceptor.class);
+					interceptor.setDetails(details);
+
+					mapping = new InterceptorMapping(mapping.getName(),
+							interceptor);
+				}
+
+				builder.addInterceptor(mapping);
+			}
 
 			return;
 		}
@@ -227,13 +274,12 @@ public class RestUnknownHandler implements UnknownHandler {
 
 		String secretResult = (String) actionContext
 				.get(RestActionInvocation.SECRET_RESULT);
+		ActionResult result = (ActionResult) actionContext
+				.get(RestActionInvocation.ACTION_RESULT);
 
 		ResultConfig.Builder builder = null;
 
-		if (resultCode.equals(secretResult)) {
-			ActionResult result = (ActionResult) actionContext
-					.get(RestActionInvocation.ACTION_RESULT);
-
+		if (result != null && resultCode.equals(secretResult)) {
 			ResultTypeConfig config = results.get(result.getType());
 			builder = new ResultConfig.Builder(null, config.getClassName())
 					.addParams(result.getParameters()).addParam(
@@ -267,9 +313,51 @@ public class RestUnknownHandler implements UnknownHandler {
 		return null;
 	}
 
+	@Override
 	public Object handleUnknownActionMethod(Object action, String methodName)
 			throws NoSuchMethodException {
-		return null;
-	}
+		if (details == null)
+			return null;
 
+		ActionContext context = ActionContext.getContext();
+		ActionInvocation invocation = context.getActionInvocation();
+		final ValueStack stack = invocation.getStack();
+
+		ActionMethodDetails methodDetails = details.getActionMethodDetails();
+		Method method = action.getClass().getMethod(
+				methodDetails.getActionMethod(), methodDetails.getParameters());
+		final Object[] parameters = new Object[methodDetails.getParameters().length];
+
+		ActionMethodParameterCallback<ActionParam> callback = new ActionMethodParameterCallback<ActionParam>() {
+			int i = 0;
+
+			@Override
+			public void methodParameterDiscovered(ActionParam annotation,
+					Class<?> type) {
+				String expr = annotation == null ? type.getName() : annotation
+						.value();
+
+				Object parameter = stack.findValue(expr, type);
+				if (type.isPrimitive() && parameter == null) {
+					parameter = primitiveDefaults.get(type);
+				}
+
+				parameters[i] = parameter;
+
+				i++;
+			}
+		};
+
+		ActionUtils.findAnnotatedMethodParam(ActionParam.class,
+				methodDetails.getParameterDetails(), callback);
+
+		try {
+			return method.invoke(action, parameters);
+		} catch (Exception e) {
+			e.printStackTrace();
+			LOG.error(e.getMessage(), e);
+
+			return null;
+		}
+	}
 }

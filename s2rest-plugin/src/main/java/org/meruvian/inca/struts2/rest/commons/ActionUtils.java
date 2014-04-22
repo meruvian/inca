@@ -17,11 +17,13 @@ package org.meruvian.inca.struts2.rest.commons;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
+import java.util.Collection;
 
 import javassist.CtClass;
 import javassist.CtMember;
 
 import org.meruvian.inca.struts2.rest.annotation.Action;
+import org.meruvian.inca.struts2.rest.discoverer.ActionMethodParameterDetails;
 
 /**
  * @author Dian Aditya
@@ -71,5 +73,28 @@ public class ActionUtils {
 			return null;
 
 		return element.getAnnotation(annotationClass);
+	}
+
+	public static <T extends Annotation> void findAnnotatedMethodParam(
+			Class<T> annotation,
+			Collection<ActionMethodParameterDetails> parameterDetails,
+			ActionMethodParameterCallback<T> callback) {
+		for (ActionMethodParameterDetails pd : parameterDetails) {
+			Class<?> parameter = pd.getType();
+			T param = null;
+			for (Annotation a : pd.getAnnotations()) {
+				if (a.annotationType().equals(annotation)) {
+					param = (T) a;
+
+					break;
+				}
+			}
+
+			callback.methodParameterDiscovered(param, parameter);
+		}
+	}
+
+	public static interface ActionMethodParameterCallback<T extends Annotation> {
+		void methodParameterDiscovered(T annotation, Class<?> type);
 	}
 }

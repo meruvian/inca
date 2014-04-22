@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 BlueOxygen Technology
+ * Copyright 2014 BlueOxygen Technology
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,19 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.meruvian.inca.struts2.rest.annotation;
+package org.meruvian.inca.struts2.rest.discoverer;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Dian Aditya
  * 
  */
-@Target({ ElementType.FIELD, ElementType.PARAMETER })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface ActionParam {
-	String value();
+public class ActionMethodParameterDetails {
+	private Class<?> type;
+	private List<Annotation> annotations = new ArrayList<Annotation>();
+
+	public Class<?> getType() {
+		return type;
+	}
+
+	public void setType(Class<?> type) {
+		this.type = type;
+	}
+
+	public List<Annotation> getAnnotations() {
+		return annotations;
+	}
+
+	public void setAnnotations(List<Annotation> annotations) {
+		this.annotations = annotations;
+	}
 }

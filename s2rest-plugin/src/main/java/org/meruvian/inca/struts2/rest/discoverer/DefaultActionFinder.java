@@ -34,6 +34,7 @@ import org.meruvian.inca.struts2.rest.annotation.Results;
 import org.meruvian.inca.struts2.rest.commons.ActionUtils;
 import org.meruvian.inca.struts2.rest.commons.RestConstants;
 
+import com.opensymphony.xwork2.config.entities.ActionConfig;
 import com.opensymphony.xwork2.inject.Container;
 import com.opensymphony.xwork2.inject.Inject;
 import com.opensymphony.xwork2.util.PatternMatcher;
@@ -51,7 +52,7 @@ public class DefaultActionFinder implements ActionFinder {
 
 	private Map<ActionDetails, ActionDetails> actionForRequest;
 	private Map<String, ActionDetails> actionForClassName;
-	private StrutsAnnotationDiscoverer discoverer;
+	private AnnotationDiscoverer discoverer;
 
 	private Map<String, Class<?>> actionClasses = new HashMap<String, Class<?>>();
 
@@ -75,31 +76,34 @@ public class DefaultActionFinder implements ActionFinder {
 	}
 
 	protected void buildActionFromMethod(ClassFile classFile) throws Exception {
-		List<String> methods = discoverer.discoverAnnotatedMethods(classFile,
-				Action.class);
+		List<ActionMethodDetails> methods = discoverer
+				.discoverAnnotatedActionMethods(classFile, Action.class);
 
 		Class<?> actionClass = Class.forName(classFile.getName());
 
-		for (String method : methods) {
+		for (ActionMethodDetails method : methods) {
 			ActionDetails details = buildActionDetails(actionClass, method);
 
 			actionForRequest.put(details, details);
 			actionForClassName.put(actionClass.getName(), details);
 		}
 
-		{
-			ActionDetails details = buildActionDetails(actionClass, null);
-
-			actionForRequest.put(details, details);
-			actionForClassName.put(actionClass.getName(), details);
-		}
+		// {
+		// ActionDetails details = buildActionDetails(actionClass, null);
+		//
+		// actionForRequest.put(details, details);
+		// actionForClassName.put(actionClass.getName(), details);
+		// }
 	}
 
 	private ActionDetails buildActionDetails(Class<?> actionClass,
-			String actionMethod) throws Exception {
+			ActionMethodDetails actionMethodDetails) throws Exception {
 
-		if (actionMethod == null)
-			actionMethod = "execute";
+		// String actionMethod;
+		// if (actionMethodDetails == null)
+		// actionMethod = "execute";
+		// else
+		// actionMethod = actionMethodDetails.getActionMethod();
 
 		Class<?> cachedActionClass = actionClasses.get(actionClass.getName());
 
@@ -111,7 +115,9 @@ public class DefaultActionFinder implements ActionFinder {
 		Method actionMethodClass = null;
 
 		try {
-			actionMethodClass = cachedActionClass.getMethod(actionMethod);
+			actionMethodClass = cachedActionClass.getMethod(
+					actionMethodDetails.getActionMethod(),
+					actionMethodDetails.getParameters());
 		} catch (NoSuchMethodException e) {
 		}
 
@@ -134,10 +140,11 @@ public class DefaultActionFinder implements ActionFinder {
 		ActionDetails details = new ActionDetails();
 
 		if (methodAnnotation == null) {
-			details.setActionMethod("execute");
+			details.setActionMethodDetails(new ActionMethodDetails(
+					ActionConfig.DEFAULT_METHOD));
 			details.setActionAnnotation(classAnnotation);
 		} else {
-			details.setActionMethod(actionMethod);
+			details.setActionMethodDetails(actionMethodDetails);
 			details.setActionAnnotation(methodAnnotation);
 		}
 

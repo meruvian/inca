@@ -15,6 +15,7 @@
  */
 package org.meruvian.inca.struts2.rest;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,6 +30,8 @@ import com.opensymphony.xwork2.ActionInvocation;
 import com.opensymphony.xwork2.ModelDriven;
 import com.opensymphony.xwork2.inject.Container;
 import com.opensymphony.xwork2.inject.Inject;
+import com.opensymphony.xwork2.util.CompoundRoot;
+import com.opensymphony.xwork2.util.ValueStack;
 import com.opensymphony.xwork2.util.logging.Logger;
 import com.opensymphony.xwork2.util.logging.LoggerFactory;
 
@@ -56,19 +59,20 @@ public class RestResult extends StrutsResultSupport {
 				.get(HTTP_REQUEST);
 		HttpServletResponse response = (HttpServletResponse) context
 				.get(HTTP_RESPONSE);
-
 		Object model = invocation.getAction();
-		if (model instanceof ModelDriven) {
-			model = ((ModelDriven) model).getModel();
-		}
 
-		if (model instanceof Map) {
+		if (context.get("model") != null) {
+			model = context.get("model");
+		} else if (model instanceof ModelDriven) {
+			model = ((ModelDriven) model).getModel();
+		} else if (model instanceof Map) {
 			Map map = (Map) model;
 			if (map.get("root") != null)
 				model = map.get("root");
 		}
 
-		ResourceTransformer processor = manager.getProcessorForResponse(request);
+		ResourceTransformer processor = manager
+				.getProcessorForResponse(request);
 		if (processor != null) {
 			response.setContentType(processor.getContentType());
 			processor.serialize(model, response.getOutputStream());
@@ -77,5 +81,4 @@ public class RestResult extends StrutsResultSupport {
 			LOG.error("Unable to serialize object");
 		}
 	}
-
 }

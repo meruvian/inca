@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.meruvian.inca.struts2.test.action.ActionTestAction;
 
 import com.opensymphony.xwork2.ActionProxy;
+import com.opensymphony.xwork2.config.ConfigurationException;
 
 /**
  * @author Dian Aditya
@@ -48,11 +49,10 @@ public class ActionTest extends IncaJUnitTestCase<ActionTestAction> {
 
 		Assert.assertEquals("defaultActionMethod", proxy.getMethod());
 
+		exception
+				.expectMessage("There is no Action mapped for namespace / and action name default");
 		request.setMethod("POST");
 		proxy = getActionProxy("/default");
-
-		exception.expect(NoSuchMethodException.class);
-		proxy.execute();
 	}
 
 	@Test

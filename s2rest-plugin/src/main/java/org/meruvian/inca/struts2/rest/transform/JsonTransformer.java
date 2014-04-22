@@ -36,6 +36,9 @@ public class JsonTransformer implements ResourceTransformer {
 				org.codehaus.jackson.map.SerializationConfig.Feature.WRITE_NULL_MAP_VALUES,
 				false);
 		mapper.configure(Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		mapper.configure(
+				org.codehaus.jackson.map.SerializationConfig.Feature.FAIL_ON_EMPTY_BEANS,
+				false);
 	}
 
 	public void serialize(Object object, OutputStream outputStream)

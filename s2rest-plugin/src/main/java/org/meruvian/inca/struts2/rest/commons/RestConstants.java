@@ -30,4 +30,6 @@ public interface RestConstants {
 	public static final String INCA_HANDLE_BY_HEADER = "struts.inca.handleRequestByHeader";
 	public static final String INCA_REST_EXTENSION_PREFIX = "struts.inca.rest.extension.prefix";
 	public static final String INCA_REST_TRANSFORM_MANAGER = "struts.inca.rest.transformManager";
+
+	public static final String INCA_ACTION_DETAILS = "struts.inca.actionDetails";
 }

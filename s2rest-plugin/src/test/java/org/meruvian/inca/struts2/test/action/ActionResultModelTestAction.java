@@ -1,5 +1,5 @@
 /**
- * Copyright 2012 BlueOxygen Technology
+ * Copyright 2014 BlueOxygen Technology
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.meruvian.inca.s2rest;
+package org.meruvian.inca.struts2.test.action;
 
+import org.meruvian.inca.struts2.rest.ActionResult;
 import org.meruvian.inca.struts2.rest.annotation.Action;
-import org.meruvian.inca.struts2.rest.annotation.Result;
-import org.meruvian.inca.struts2.rest.annotation.Results;
 
 /**
+ * 
  * @author Dian Aditya
  * 
  */
-@Action
-@Results({ @Result(name = "success", location = "/WEB-INF/view/index.jsp") })
-public class IndexAction implements com.opensymphony.xwork2.Action {
+@Action(name = "/resultmodel/{st}")
+public class ActionResultModelTestAction {
+	private int st;
 
 	@Action
-	public String execute() throws Exception {
-		return SUCCESS;
+	public ActionResult index() {
+		String[] arr = new String[st];
+		for (int i = 0; i < st; i++) {
+			arr[i] = i + "";
+		}
+
+		return new ActionResult("freemarker", "/view/default_test_result.ftl")
+				.addToModel("modelFromResult", "modelFromResult").addToModel(
+						"arr", arr);
 	}
 
+	public void setSt(int st) {
+		this.st = st;
+	}
 }

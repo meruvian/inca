@@ -30,7 +30,7 @@ import org.meruvian.inca.struts2.rest.annotation.Result;
  */
 public class ActionDetails {
 	private Class<?> actionClass;
-	private String actionMethod;
+	private ActionMethodDetails actionMethodDetails = new ActionMethodDetails();
 	private Action actionAnnotation;
 	private Map<String, Result> actionResults = new HashMap<String, Result>();
 	private Interceptors interceptors;
@@ -59,12 +59,12 @@ public class ActionDetails {
 		this.actionClass = actionClass;
 	}
 
-	public String getActionMethod() {
-		return actionMethod;
+	public ActionMethodDetails getActionMethodDetails() {
+		return actionMethodDetails;
 	}
 
-	public void setActionMethod(String actionMethod) {
-		this.actionMethod = actionMethod;
+	public void setActionMethodDetails(ActionMethodDetails actionMethodDetails) {
+		this.actionMethodDetails = actionMethodDetails;
 	}
 
 	public Action getActionAnnotation() {

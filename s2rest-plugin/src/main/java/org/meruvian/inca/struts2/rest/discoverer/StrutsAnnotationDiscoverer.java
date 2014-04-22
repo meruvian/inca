@@ -20,6 +20,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,6 +37,8 @@ import javassist.bytecode.FieldInfo;
 import javassist.bytecode.MethodInfo;
 import javassist.bytecode.annotation.Annotation;
 
+import org.apache.commons.lang3.AnnotationUtils;
+import org.meruvian.inca.struts2.rest.commons.ActionUtils;
 import org.meruvian.inca.struts2.rest.commons.ClasspathUtil;
 
 import com.opensymphony.xwork2.util.finder.Test;
@@ -128,6 +131,42 @@ public class StrutsAnnotationDiscoverer implements AnnotationDiscoverer {
 		return annotatedMethods;
 	}
 
+	@Override
+	public List<ActionMethodDetails> discoverAnnotatedActionMethods(
+			ClassFile cf,
+			Class<? extends java.lang.annotation.Annotation> annotation)
+			throws Exception {
+		List<ActionMethodDetails> annotatedMethods = new ArrayList<ActionMethodDetails>();
+		Class<?> actionClass = Class.forName(cf.getName());
+
+		for (Method method : actionClass.getDeclaredMethods()) {
+			Set<java.lang.annotation.Annotation> annotations = new HashSet<java.lang.annotation.Annotation>();
+
+			annotations.addAll(Arrays.asList(method.getAnnotations()));
+			annotations.addAll(Arrays.asList(method.getDeclaredAnnotations()));
+
+			if (ActionUtils.findAnnotation(method, annotation) != null) {
+				ActionMethodDetails details = new ActionMethodDetails(
+						method.getName());
+				java.lang.annotation.Annotation[][] anns = method
+						.getParameterAnnotations();
+				int i = 0;
+				for (Class<?> parameter : method.getParameterTypes()) {
+					ActionMethodParameterDetails pd = new ActionMethodParameterDetails();
+					pd.setType(parameter);
+					pd.setAnnotations(Arrays.asList(anns[i]));
+
+					details.getParameterDetails().add(pd);
+					i++;
+				}
+
+				annotatedMethods.add(details);
+			}
+		}
+
+		return annotatedMethods;
+	}
+
 	public List<String> discoverAnnotatedFields(ClassFile cf,
 			Class<? extends java.lang.annotation.Annotation> annotation)
 			throws Exception {
@@ -213,4 +252,5 @@ public class StrutsAnnotationDiscoverer implements AnnotationDiscoverer {
 
 		return files;
 	}
+
 }

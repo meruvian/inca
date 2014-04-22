@@ -48,6 +48,17 @@ public interface AnnotationDiscoverer {
 
 	/**
 	 * 
+	 * @param classFile
+	 * @param annotation
+	 * @return The list of annotated methods from specified class
+	 * @throws Exception
+	 */
+	List<ActionMethodDetails> discoverAnnotatedActionMethods(
+			ClassFile classFile, Class<? extends Annotation> annotation)
+			throws Exception;
+
+	/**
+	 * 
 	 * @param className
 	 * @param annotation
 	 * @return The list of annotated fields from specified class
