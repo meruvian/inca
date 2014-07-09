@@ -118,10 +118,10 @@ public class ProfileAction {
     }
     // ...
 }
-</pre>
+```
 
 == Interceptor Mappings ==
-<pre name="java">
+```java
 // ...
 
 @Action(name = "/details", method = HttpMethod.GET)
